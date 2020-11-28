@@ -55,7 +55,6 @@ public class Mt940Service {
 
     public BaseResponse generate(BankMutationDataRequest request){
         //generate mt940 component
-
         SwiftMessage message = new SwiftMessage();
         message.setBlock1(generateBlock1(request.getBankName()));
         message.setBlock2(generateBlock2());
@@ -104,7 +103,7 @@ public class Mt940Service {
 
     private SwiftBlock4 generateBlock4(BankMutationDataRequest request){
         String formatDatePeriod = dateUtil.convertToOtherFormat(request.getPeriodDate(), FORMAT_DATE1, FORMAT_DATE2);
-        String formatBalanceDate = dateUtil.convertToOtherFormat(request.getBalanceDate(), FORMAT_DATE3, FORMAT_DATE2);
+        String formatBalanceDate = dateUtil.convertToOtherFormat(request.getBalanceDate(), FORMAT_DATE3, FORMAT_DATE3);
 
         SwiftBlock4 block4 = new SwiftBlock4();
 
@@ -113,6 +112,9 @@ public class Mt940Service {
 
         Field25 field25 = new Field25();
         field25.setAccount(request.getBankAccountNumber());
+
+        Field28C field28C = new Field28C();
+        field28C.setStatementNumber(formatBalanceDate);
 
         BigDecimal initialBalance = new BigDecimal(request.getInitialBalance());
 
