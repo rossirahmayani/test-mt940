@@ -14,7 +14,6 @@ import com.rossi.testmt940.util.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -32,11 +31,15 @@ public class Mt940Service {
     @Autowired
     JsonUtil jsonUtil;
 
+    @Autowired
+    GenerateFileService generateFileService;
+
     private static final String FORMAT_DATE1 = "yyyy-MM-dd";
     private static final String FORMAT_DATE2 = "yyyyMMddHHmmss";
     private static final String FORMAT_DATE3 = "yyMMdd";
 
     public BaseResponse parse(String mtString) throws IOException {
+        //parse mt940
         SwiftParser parser = new SwiftParser();
         parser.setReader(new StringReader(mtString));
         SwiftMessage message = parser.message();
@@ -51,17 +54,23 @@ public class Mt940Service {
     }
 
     public BaseResponse generate(BankMutationDataRequest request){
+        //generate mt940 component
+
         SwiftMessage message = new SwiftMessage();
         message.setBlock1(generateBlock1(request.getBankName()));
         message.setBlock2(generateBlock2());
         message.setBlock4(generateBlock4(request));
 
         MT940 mt940 = new MT940(message);
+        String result = mt940.message();
+
+        //generate file
+        generateFileService.generateFile(result);
 
         return BaseResponse.builder()
                 .responseCode(ResponseCode.SUCCESS.getCode())
                 .responseMessage(ResponseCode.SUCCESS.getMessage())
-                .responseData(mt940.message())
+                .responseData(result)
                 .build();
     }
 
@@ -105,10 +114,10 @@ public class Mt940Service {
         Field25 field25 = new Field25();
         field25.setAccount(request.getBankAccountNumber());
 
-        BigDecimal initialBalance = request.getInitialBalance();
+        BigDecimal initialBalance = new BigDecimal(request.getInitialBalance());
 
         Field60F field60F = new Field60F();
-        field60F.setAmount(initialBalance);
+        field60F.setAmount(request.getInitialBalance());
         field60F.setCurrency("IDR");
         field60F.setDate(formatBalanceDate);
         field60F.setDCMark(MutationType.CREDIT.getCode());
@@ -123,6 +132,10 @@ public class Mt940Service {
             field61.setValueDate(formatDateMutation);
             field61.setDCMark(m.getMutationType());
             field61.setAmount(m.getAmount());
+            field61.setTransactionType("N");
+            field61.setIdentificationCode("TRF");
+            field61.setReferenceForTheAccountOwner("");
+            field61.setReferenceOfTheAccountServicingInstitution("");
 
             Field86 field86 = new Field86();
             field86.setNarrative(m.getDescription());
@@ -130,14 +143,14 @@ public class Mt940Service {
             block4.append(field61, field86);
 
             MutationType type = MutationType.byCode(m.getMutationType());
-            BigDecimal mutationAmount = getAmount(type, m.getAmount());
+            BigDecimal mutationAmount = getAmount(type, new BigDecimal(m.getAmount()));
 
             lastBalance = lastBalance.add(mutationAmount);
         }
 
 
         Field62F field62F = new Field62F();
-        field62F.setAmount(lastBalance);
+        field62F.setAmount(lastBalance.toBigInteger().toString());
         field62F.setCurrency("IDR");
         field62F.setDate(formatBalanceDate);
         field62F.setDCMark(MutationType.CREDIT.getCode());

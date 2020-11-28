@@ -13,7 +13,7 @@ public class BankMutationDataRequest {
     private String bankAccountNumber;
     private String bankName;
     private String periodDate;
-    private BigDecimal initialBalance;
+    private String initialBalance;
     private String balanceDate;
     private List<MutationData> mutations;
 }
