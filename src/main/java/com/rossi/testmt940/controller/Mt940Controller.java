@@ -20,7 +20,7 @@ public class Mt940Controller {
 
 
     @PostMapping("/parse")
-    public ResponseEntity<BaseResponse> parse(@RequestParam String mtString) throws IOException {
+    public ResponseEntity<BaseResponse> parse(@RequestBody String mtString) throws IOException {
         return ResponseEntity.ok(mt940Service.parse(mtString));
     }
 
