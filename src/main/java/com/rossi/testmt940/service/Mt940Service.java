@@ -86,10 +86,10 @@ public class Mt940Service {
     private SwiftBlock2Input generateBlock2(){
         SwiftBlock2Input block2Input = new SwiftBlock2Input();
         block2Input.setMessageType("940");
-        block2Input.setReceiverAddress("NUSA SATU IN");
-        block2Input.setMessagePriority("T");
-        block2Input.setDeliveryMonitoring("I");
-        block2Input.setObsolescencePeriod(" ARTHA");
+        block2Input.setReceiverAddress("NUSA SATU INTI ARTHA");
+        block2Input.setMessagePriority("");
+        block2Input.setDeliveryMonitoring("");
+        block2Input.setObsolescencePeriod("");
         return block2Input;
     }
 
