@@ -84,7 +84,7 @@ public class Mt940Service {
         SwiftBlock1 block1 = new SwiftBlock1();
         block1.setApplicationId("F");
         block1.setServiceId("01");
-        block1.setLogicalTerminal(bankName);
+        block1.setLogicalTerminal(bankName.toUpperCase());
         block1.setSessionNumber("");
         block1.setSequenceNumber("");
 
@@ -120,7 +120,7 @@ public class Mt940Service {
 
         Field60F field60F = new Field60F();
         field60F.setAmount(request.getInitialBalance());
-        field60F.setCurrency("IDR");
+        field60F.setCurrency(request.getCurrency().toUpperCase());
         field60F.setDate(formatBalanceDate);
         field60F.setDCMark(MutationType.CREDIT.getCode());
 
@@ -153,7 +153,7 @@ public class Mt940Service {
 
         Field62F field62F = new Field62F();
         field62F.setAmount(lastBalance.toBigInteger().toString());
-        field62F.setCurrency("IDR");
+        field62F.setCurrency(request.getCurrency().toUpperCase());
         field62F.setDate(formatBalanceDate);
         field62F.setDCMark(MutationType.CREDIT.getCode());
 
