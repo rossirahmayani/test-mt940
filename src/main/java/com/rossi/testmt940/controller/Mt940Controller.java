@@ -1,13 +1,12 @@
 package com.rossi.testmt940.controller;
 
-import com.rossi.testmt940.model.BankMutationDataRequest;
+import com.rossi.testmt940.model.BankMutationRequest;
 import com.rossi.testmt940.model.BaseResponse;
 import com.rossi.testmt940.service.Mt940Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
@@ -25,7 +24,7 @@ public class Mt940Controller {
     }
 
     @PostMapping("/generate")
-    public ResponseEntity<BaseResponse> generate(@RequestBody BankMutationDataRequest request){
+    public ResponseEntity<BaseResponse> generate(@RequestBody BankMutationRequest request){
         return ResponseEntity.ok(mt940Service.generate(request));
     }
 

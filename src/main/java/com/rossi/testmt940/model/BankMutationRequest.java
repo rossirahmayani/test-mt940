@@ -9,7 +9,7 @@ import java.util.List;
 
 @Setter
 @Getter
-public class BankMutationDataRequest {
+public class BankMutationRequest {
     private String bankAccountNumber;
     private String bankName;
     private String periodDate;

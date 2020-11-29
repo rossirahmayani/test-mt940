@@ -6,7 +6,7 @@ import com.prowidesoftware.swift.model.field.*;
 import com.prowidesoftware.swift.model.mt.mt9xx.MT940;
 import com.rossi.testmt940.enums.MutationType;
 import com.rossi.testmt940.enums.ResponseCode;
-import com.rossi.testmt940.model.BankMutationDataRequest;
+import com.rossi.testmt940.model.BankMutationRequest;
 import com.rossi.testmt940.model.BaseResponse;
 import com.rossi.testmt940.model.MutationData;
 import com.rossi.testmt940.util.DateUtil;
@@ -43,6 +43,7 @@ public class Mt940Service {
         SwiftParser parser = new SwiftParser();
         parser.setReader(new StringReader(mtString));
         SwiftMessage message = parser.message();
+
         MT940 mt940 = new MT940(message);
         String result = mt940.toJson();
 
@@ -53,7 +54,7 @@ public class Mt940Service {
                 .build();
     }
 
-    public BaseResponse generate(BankMutationDataRequest request){
+    public BaseResponse generate(BankMutationRequest request){
         //generate mt940 component
         SwiftMessage message = new SwiftMessage();
         message.setBlock1(generateBlock1(request.getBankName()));
@@ -101,7 +102,7 @@ public class Mt940Service {
         return block2Input;
     }
 
-    private SwiftBlock4 generateBlock4(BankMutationDataRequest request){
+    private SwiftBlock4 generateBlock4(BankMutationRequest request){
         String formatDatePeriod = dateUtil.convertToOtherFormat(request.getPeriodDate(), FORMAT_DATE1, FORMAT_DATE2);
         String formatBalanceDate = dateUtil.convertToOtherFormat(request.getBalanceDate(), FORMAT_DATE3, FORMAT_DATE3);
 
