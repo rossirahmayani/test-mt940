@@ -125,7 +125,7 @@ public class Mt940Service {
         field60F.setDate(formatBalanceDate);
         field60F.setDCMark(MutationType.CREDIT.getCode());
 
-        block4.append(field20, field25, field60F);
+        block4.append(field20, field25, field28C, field60F);
 
         BigDecimal lastBalance = initialBalance;
         for(MutationData m : request.getMutations()){
