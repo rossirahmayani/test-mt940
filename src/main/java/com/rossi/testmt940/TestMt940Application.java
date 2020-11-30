@@ -20,7 +20,7 @@ public class TestMt940Application {
 
     @Bean
     public RouterFunction<ServerResponse> routerFunction() {
-        return route(GET("/swagger"), req ->
+        return route(GET("/"), req ->
                 ServerResponse.temporaryRedirect(URI.create("swagger-ui.html")).build());
     }
 

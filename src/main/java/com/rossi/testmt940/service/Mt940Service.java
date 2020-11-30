@@ -115,7 +115,7 @@ public class Mt940Service {
         field25.setAccount(request.getBankAccountNumber());
 
         Field28C field28C = new Field28C();
-        field28C.setStatementNumber(formatBalanceDate);
+        field28C.setStatementNumber("00111");
 
         BigDecimal initialBalance = new BigDecimal(request.getInitialBalance());
 
@@ -150,7 +150,6 @@ public class Mt940Service {
 
             lastBalance = lastBalance.add(mutationAmount);
         }
-
 
         Field62F field62F = new Field62F();
         field62F.setAmount(lastBalance.toBigInteger().toString());
