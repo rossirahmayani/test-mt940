@@ -53,10 +53,10 @@ public class APIExceptionHandler {
     @ExceptionHandler(BindException.class)
     public ResponseEntity<BaseResponse> handleBindException(BindException ex) {
         log.warn("Handle BindException ...");
-        String responseCode = commonUtil.getSingleErrorMessage(ex.getFieldErrors(), ex.getGlobalErrors());
+        String message = commonUtil.getSingleErrorMessage(ex.getFieldErrors(), ex.getGlobalErrors());
         BaseResponse response = BaseResponse.builder().build();
-        response.setResponseCode(responseCode);
-        response.setResponseMessage(ResponseCode.byCode(responseCode).getMessage());
+        response.setResponseCode(ResponseCode.INSUFFICIENT_PARAMS.getCode());
+        response.setResponseMessage(message);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 @Getter
 public enum ResponseCode {
     SUCCESS("0000", "Success"),
-    PARAMETER_NOT_COMPLETE("0001", "Parameter not Complete"),
+    INSUFFICIENT_PARAMS("0001", "Parameter not Complete"),
     ERROR_UNKNOWN("9999", "Error Unknown");
 
     private String code;
