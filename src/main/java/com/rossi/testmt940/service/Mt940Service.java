@@ -41,8 +41,8 @@ public class Mt940Service {
         SwiftParser parser = new SwiftParser();
         parser.setReader(new StringReader(mtString));
         SwiftMessage message = parser.message();
-
         MT940 mt940 = new MT940(message);
+
         BigDecimal initBalance = mt940.getField60F().amount();
         String period = mt940.getField20().getReference();
         String bankAccNum = mt940.getField25().getAccount();
@@ -50,6 +50,8 @@ public class Mt940Service {
         BigDecimal totalCredit = BigDecimal.ZERO;
 
         List<MutationData> mutations = new ArrayList<>();
+
+        //generate mutations
         for(int i = 0; i < mt940.getField61().size(); i++){
             Field61 field61 = mt940.getField61().get(i);
             Field86 field86 = mt940.getField86().get(i);
