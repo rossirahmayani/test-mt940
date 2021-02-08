@@ -7,10 +7,10 @@ import com.prowidesoftware.swift.model.mt.mt9xx.MT940;
 import com.rossi.testmt940.enums.MutationType;
 import com.rossi.testmt940.enums.ResponseCode;
 import com.rossi.testmt940.model.BankMutationRequest;
+import com.rossi.testmt940.model.BankMutationResponse;
 import com.rossi.testmt940.model.BaseResponse;
 import com.rossi.testmt940.model.MutationData;
 import com.rossi.testmt940.util.DateUtil;
-import com.rossi.testmt940.util.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,8 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.io.StringReader;
 import java.math.BigDecimal;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -27,9 +28,6 @@ public class Mt940Service {
 
     @Autowired
     DateUtil dateUtil;
-
-    @Autowired
-    JsonUtil jsonUtil;
 
     @Autowired
     GenerateFileService generateFileService;
@@ -45,12 +43,48 @@ public class Mt940Service {
         SwiftMessage message = parser.message();
 
         MT940 mt940 = new MT940(message);
-        String result = mt940.toJson();
+        BigDecimal initBalance = mt940.getField60F().amount();
+        String period = mt940.getField20().getReference();
+        String bankAccNum = mt940.getField25().getAccount();
+        BigDecimal totalDebit = BigDecimal.ZERO;
+        BigDecimal totalCredit = BigDecimal.ZERO;
+
+        List<MutationData> mutations = new ArrayList<>();
+        for(int i = 0; i < mt940.getField61().size(); i++){
+            Field61 field61 = mt940.getField61().get(i);
+            Field86 field86 = mt940.getField86().get(i);
+
+            String mutationType = field61.getDCMark();
+
+            MutationData mutationData = new MutationData();
+            mutationData.setMutationDate(field61.getValueDate());
+            mutationData.setMutationType(MutationType.byCode(mutationType).getDescription());
+            mutationData.setAmount(field61.getAmount());
+            mutationData.setDescription(field86.getNarrative());
+            mutations.add(mutationData);
+
+            if (mutationType.equalsIgnoreCase(MutationType.CREDIT.getCode())){
+                totalCredit = totalCredit.add(field61.amount());
+            }
+            else {
+                totalDebit = totalDebit.add(field61.amount());
+            }
+        }
+
+        BigDecimal lastBalance = initBalance.add(totalCredit).subtract(totalDebit);
+
+        BankMutationResponse response = BankMutationResponse
+                .builder().periodDate(period).totalMutations(mutations.size())
+                .bankAccNum(bankAccNum).initialBalance(initBalance)
+                .totalCredit(totalCredit).totalDebit(totalDebit)
+                .mutations(mutations).countedLastBalance(lastBalance)
+                .reportedLastBalance(mt940.getField62F().amount())
+                .build();
 
         return BaseResponse.builder()
                 .responseCode(ResponseCode.SUCCESS.getCode())
                 .responseMessage(ResponseCode.SUCCESS.getMessage())
-                .responseData(jsonUtil.convertJson(result, HashMap.class))
+                .responseData(response)
                 .build();
     }
 
