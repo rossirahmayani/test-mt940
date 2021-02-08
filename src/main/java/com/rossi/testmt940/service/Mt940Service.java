@@ -57,19 +57,20 @@ public class Mt940Service {
             Field86 field86 = mt940.getField86().get(i);
 
             String mutationType = field61.getDCMark();
+            BigDecimal amount = field61.amount();
 
             MutationData mutationData = new MutationData();
-            mutationData.setMutationDate(field61.getValueDate());
+            mutationData.setMutationDate(dateUtil.convertToOtherFormat(field61.getValueDate(), FORMAT_DATE3, FORMAT_DATE1));
             mutationData.setMutationType(MutationType.byCode(mutationType).getDescription());
-            mutationData.setAmount(field61.getAmount());
+            mutationData.setAmount(amount);
             mutationData.setDescription(field86.getNarrative());
             mutations.add(mutationData);
 
             if (mutationType.equalsIgnoreCase(MutationType.CREDIT.getCode())){
-                totalCredit = totalCredit.add(field61.amount());
+                totalCredit = totalCredit.add(amount);
             }
             else {
-                totalDebit = totalDebit.add(field61.amount());
+                totalDebit = totalDebit.add(amount);
             }
         }
 
@@ -182,7 +183,7 @@ public class Mt940Service {
             block4.append(field61, field86);
 
             MutationType type = MutationType.byCode(m.getMutationType());
-            BigDecimal mutationAmount = getAmount(type, new BigDecimal(m.getAmount()));
+            BigDecimal mutationAmount = getAmount(type, m.getAmount());
 
             lastBalance = lastBalance.add(mutationAmount);
         }
